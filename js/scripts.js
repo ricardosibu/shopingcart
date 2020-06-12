@@ -2,6 +2,7 @@ const CAR_PRODUCTS = "cartProductsId";
 
 document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
+    loadProductsCart()
 });
 
 function getProducts() {
@@ -70,4 +71,63 @@ function addProductsCart(idProducts) {
         localStorage.setItem(CAR_PRODUCTS, productsId);
     }
 
+    loadProductsCart();
+}
+
+async function loadProductsCart() {
+    const products = await getProducts();
+    let html = "";
+
+    const localStorageItems = localStorage.getItem(CAR_PRODUCTS);
+
+    if(!localStorageItems) {
+       html = `
+        <div class="cart-product empty">
+            <p>Carrito vacio..</p>
+        </div>
+        `;
+    } else {
+
+    const idProductsSplit = localStorageItems.split(",");
+    
+    //Eliminar duplicados
+    const idProductsCarts = Array.from(new Set(idProductsSplit));
+    
+    idProductsCarts.forEach(id => {
+        products.forEach(product => {
+            if(id == product.id) {
+                const quantity = countDuplicatesId(id, idProductsSplit);
+                const totalPrice = product.price * quantity;
+                html += `
+                    <div class="cart-product>
+                        <img src="${product.image}" alt="${product.name}" />
+                        <div class="cart-product-info">
+                            <span class="quantity">${quantity}</span>
+                            <p>${product.name}</p>
+                            <p>${totalPrice.toFixed(2)}</p>
+                            <p class="change-quantity">
+                                <button>-</button>
+                                <button>+</button>
+                            </p>
+                            <p class="cart-product-delete">
+                                <button>Eliminar</button>
+                            </p>
+                        </div>
+                    </div>
+                `
+            }
+        });
+    });
+}
+    document.getElementsByClassName("cart-products")[0].innerHTML = html;
+}
+
+function countDuplicatesId(value, arrayIds) {
+    let count = 0;
+    arrayIds.forEach(id => {
+        if(value == id) {
+            count++;
+        }
+    });
+    return count;
 }
