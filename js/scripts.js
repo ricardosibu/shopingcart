@@ -35,6 +35,7 @@ async function loadProducts() {
     
     </div>
         `;
+        
     });
     document.getElementsByClassName("products")[0].innerHTML = html;
 }
@@ -58,10 +59,11 @@ function openCloseCart() {
 function addProductsCart(idProducts) {
     let arrayProductsId = [];
     let localStorageItems = localStorage.getItem(CAR_PRODUCTS);
-
+    
     if(localStorageItems == null) {
         arrayProductsId.push(idProducts);
         localStorage.setItem(CAR_PRODUCTS, arrayProductsId);
+        console.log(arrayProductsId);
     } else {
         let productsId = localStorage.getItem(CAR_PRODUCTS);
         if(productsId.length > 0) {
@@ -69,6 +71,8 @@ function addProductsCart(idProducts) {
         }
 
         localStorage.setItem(CAR_PRODUCTS, productsId);
+        console.log(productsId);
+        
     }
 
     loadProductsCart();
@@ -100,21 +104,23 @@ async function loadProductsCart() {
                 const totalPrice = product.price * quantity;
                 html += `
                     <div class="cart-product>
-                        <img src="${product.image}" alt="${product.name}" />
+                    <img src="${product.image}" alt="${product.name}" />
                         <div class="cart-product-info">
                             <span class="quantity">${quantity}</span>
                             <p>${product.name}</p>
                             <p>${totalPrice.toFixed(2)}</p>
                             <p class="change-quantity">
-                                <button>-</button>
-                                <button>+</button>
+                                <button onClick="decreaseQuantity(${product.id})">-</button>
+                                <button onClick="increaseQuantity(${product.id})">+</button>
                             </p>
                             <p class="cart-product-delete">
-                                <button>Eliminar</button>
+                                <button onClick=(deleteProductsCart(${product.id}))>Eliminar</button>
                             </p>
                         </div>
                     </div>
                 `
+                console.log(product.image);
+                ;
             }
         });
     });
@@ -131,3 +137,76 @@ function countDuplicatesId(value, arrayIds) {
     });
     return count;
 }
+
+function deleteProductsCart(idProduct) {
+    const idProductCart = localStorage.getItem(CAR_PRODUCTS);
+    const arrayIdProductsCart = idProductCart.split(",");
+    const resultIdDelete = deleteAllIds(idProduct, arrayIdProductsCart);
+
+    if(resultIdDelete) {
+        let count = 0;
+        let idsString = "";
+
+        resultIdDelete.forEach(id => {
+            count++;
+            if(count < resultIdDelete.length) {
+                idsString += id + ",";
+            } else {
+                idsString += id;
+            }
+        });
+        localStorage.setItem(CAR_PRODUCTS, idsString);
+    }
+    loadProductsCart();
+}
+
+function increaseQuantity(idProduct) {
+    const idProductCart = localStorage.getItem(CAR_PRODUCTS);
+    const arrayIdProductsCart = idProductCart.split(",");
+    arrayIdProductsCart.push(idProduct);
+
+    let count = 0;
+    let idsString = "";
+    arrayIdProductsCart.forEach(id => {
+        count++;
+        if(count < arrayIdProductsCart.length) {
+            idsString+= id + ",";
+        } else {
+            idsString += id;
+        }
+    });
+    localStorage.setItem(CAR_PRODUCTS, idsString);
+    loadProductsCart();
+}
+
+function decreaseQuantity(idProduct) {
+    const idProductsCart = localStorage.getItem(CAR_PRODUCTS);
+    const arrayIdProductsCart = idProductsCart.split(",");
+  
+    const deleteItem = idProduct.toString();
+    let index = arrayIdProductsCart.indexOf(deleteItem);
+    if (index > -1) {
+      arrayIdProductsCart.splice(index, 1);
+    }
+  
+    let count = 0;
+    let idsString = "";
+    arrayIdProductsCart.forEach(id => {
+      count++;
+      if (count < arrayIdProductsCart.length) {
+        idsString += id + ",";
+      } else {
+        idsString += id;
+      }
+    });
+    localStorage.setItem(CAR_PRODUCTS, idsString);
+    loadProductsCart();
+  }
+
+
+
+function deleteAllIds(id, arrayIds) {
+    return arrayIds.filter(itemId => {
+      return itemId != id;
+    });
+  }
