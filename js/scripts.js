@@ -59,11 +59,10 @@ function openCloseCart() {
 function addProductsCart(idProducts) {
     let arrayProductsId = [];
     let localStorageItems = localStorage.getItem(CAR_PRODUCTS);
-    
-    if(localStorageItems == null) {
+
+    if(localStorageItems === null) {
         arrayProductsId.push(idProducts);
         localStorage.setItem(CAR_PRODUCTS, arrayProductsId);
-        console.log(arrayProductsId);
     } else {
         let productsId = localStorage.getItem(CAR_PRODUCTS);
         if(productsId.length > 0) {
@@ -71,7 +70,6 @@ function addProductsCart(idProducts) {
         }
 
         localStorage.setItem(CAR_PRODUCTS, productsId);
-        console.log(productsId);
         
     }
 
@@ -103,7 +101,7 @@ async function loadProductsCart() {
                 const quantity = countDuplicatesId(id, idProductsSplit);
                 const totalPrice = product.price * quantity;
                 html += `
-                    <div class="cart-product>
+                    <div class="cart-product">
                     <img src="${product.image}" alt="${product.name}" />
                         <div class="cart-product-info">
                             <span class="quantity">${quantity}</span>
@@ -119,7 +117,6 @@ async function loadProductsCart() {
                         </div>
                     </div>
                 `
-                console.log(product.image);
                 ;
             }
         });
